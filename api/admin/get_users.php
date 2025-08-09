@@ -1,20 +1,35 @@
 <?php
-require_once '../../config/config.php';
+require_once '../../config.php';
 require_once '../helpers.php';
 
-// In a real app, you would add an admin authentication check here.
-// For example:
-// session_start();
-// if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-//     send_json_response(403, ['status' => 'error', 'message' => 'Forbidden']);
-// }
+/*
+session_start();
+if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+    send_json_response(403, ['status' => 'error', 'message' => 'Forbidden']);
+}
+*/
 
-$mock_users = [
-    ['id' => 1, 'name' => 'Dev User', 'telegram' => '@devuser', 'email' => 'dev.user@example.com', 'kyc_status' => 'approved'],
-    ['id' => 2, 'name' => 'Jane Doe', 'telegram' => '@janedoe', 'email' => 'jane@example.com', 'kyc_status' => 'pending'],
-    ['id' => 3, 'name' => 'John Smith', 'telegram' => '@johnsmith', 'email' => 'john@example.com', 'kyc_status' => 'rejected'],
-    ['id' => 4, 'name' => 'Emily White', 'telegram' => '@emilyw', 'email' => 'emily@example.com', 'kyc_status' => 'pending'],
-];
+try {
+    // A more advanced query could include search and pagination
+    $stmt = $pdo->query(
+        "SELECT u.id, u.first_name, u.last_name, u.username, u.email, p.kyc_status
+         FROM users u
+         LEFT JOIN user_profiles p ON u.id = p.user_id
+         ORDER BY u.id DESC"
+    );
+    $users = $stmt->fetchAll();
 
-send_json_response(200, ['status' => 'success', 'data' => $mock_users]);
+    // Combine first and last name for display
+    $users = array_map(function($user) {
+        $user['name'] = trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? ''));
+        unset($user['first_name'], $user['last_name']);
+        return $user;
+    }, $users);
+
+    send_json_response(200, ['status' => 'success', 'data' => $users]);
+
+} catch (Exception $e) {
+    error_log("Admin get_users failed: " . $e->getMessage());
+    send_json_response(500, ['status' => 'error', 'message' => 'Failed to fetch users.']);
+}
 ?>

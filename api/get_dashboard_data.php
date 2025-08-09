@@ -1,68 +1,79 @@
 <?php
-require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/helpers.php';
 require_once __DIR__ . '/auth.php';
 
-// Authenticate the user (uses the dev fallback if `initData` is not present)
 $user = handleTelegramAuth();
 $user_id = $user['id'];
 
-// --- MOCK DATA ---
-// This section simulates fetching data from the database using the $user_id.
-// In a real implementation, you would replace this with actual database queries.
+try {
+    // For now, we assume a fixed USD value for crypto. A real app would use an API or a prices table.
+    $usd_prices = ['BTC' => 20000, 'ETH' => 1500, 'USDT-TRC20' => 1, 'USD' => 1];
 
-// Mock wallet balances
-$mock_wallets = [
-    ['currency' => 'BTC', 'balance' => 0.0512, 'usd_value' => 3100.50],
-    ['currency' => 'USDT-TRC20', 'balance' => 1050.75, 'usd_value' => 1050.75],
-    ['currency' => 'ETH', 'balance' => 0.15, 'usd_value' => 450.25],
-];
-$total_wallet_usd = array_sum(array_column($mock_wallets, 'usd_value'));
+    // Get total wallet value
+    $wallet_stmt = $pdo->prepare("SELECT currency, balance FROM wallets WHERE user_id = ?");
+    $wallet_stmt->execute([$user_id]);
+    $wallets = $wallet_stmt->fetchAll();
+    $total_wallet_usd = 0;
+    foreach ($wallets as $wallet) {
+        $total_wallet_usd += $wallet['balance'] * ($usd_prices[$wallet['currency']] ?? 0);
+    }
 
-// Mock loan status
-$mock_loan = [
-    'has_active_loan' => true,
-    'amount' => 500.00,
-    'next_payment_due' => date('Y-m-d', strtotime('+15 days')),
-];
+    // Get active loan
+    $loan_stmt = $pdo->prepare("SELECT * FROM loans WHERE user_id = ? AND status = 'active' LIMIT 1");
+    $loan_stmt->execute([$user_id]);
+    $active_loan = $loan_stmt->fetch();
 
-// Mock savings balance
-$mock_savings = [
-    'balance' => 2000.00,
-    'apy' => 5.00,
-];
+    // Get savings balance
+    $savings_stmt = $pdo->prepare("SELECT balance, interest_rate FROM savings WHERE user_id = ? LIMIT 1");
+    $savings_stmt->execute([$user_id]);
+    $savings = $savings_stmt->fetch();
 
-// Mock KYC status from user profile
-$mock_profile = [
-    'kyc_status' => 'pending', // Can be 'pending', 'approved', 'rejected'
-];
+    // Get KYC status
+    $kyc_stmt = $pdo->prepare("SELECT kyc_status FROM user_profiles WHERE user_id = ? LIMIT 1");
+    $kyc_stmt->execute([$user_id]);
+    $kyc_status = $kyc_stmt->fetchColumn();
 
-// Mock recent transactions
-$mock_transactions = [
-    ['type' => 'deposit', 'description' => '+0.005 BTC', 'date' => date('Y-m-d', strtotime('-2 days'))],
-    ['type' => 'withdrawal', 'description' => '-100.00 USDT', 'date' => date('Y-m-d', strtotime('-3 days'))],
-    ['type' => 'loan', 'description' => 'Loan Disbursement', 'date' => date('Y-m-d', strtotime('-5 days'))],
-];
-// --- END MOCK DATA ---
+    // Get recent transactions
+    $tx_stmt = $pdo->prepare("SELECT type, amount, currency, created_at FROM transactions WHERE user_id = ? ORDER BY id DESC LIMIT 5");
+    $tx_stmt->execute([$user_id]);
+    $recent_transactions = $tx_stmt->fetchAll();
 
+    // Assemble the data payload
+    $dashboard_data = [
+        'user' => [
+            'first_name' => $user['first_name'],
+            'kyc_status' => $kyc_status,
+        ],
+        'wallet' => [
+            'total_usd' => number_format($total_wallet_usd, 2),
+        ],
+        'loan' => [
+            'has_active_loan' => (bool)$active_loan,
+            'amount' => $active_loan['amount'] ?? 0,
+            // A more complex query would be needed for a precise due date
+            'next_payment_due' => $active_loan ? date('Y-m-d', strtotime('+30 days')) : null,
+        ],
+        'savings' => [
+            'balance' => $savings['balance'] ?? 0,
+            'apy' => $savings['interest_rate'] ?? 0,
+        ],
+        'transactions' => array_map(function($tx) {
+            return [
+                'type' => $tx['type'],
+                'description' => ($tx['amount'] > 0 ? '+' : '') . rtrim(rtrim(number_format($tx['amount'], 8), '0'), '.') . ' ' . $tx['currency'],
+                'date' => date('Y-m-d', strtotime($tx['created_at'])),
+            ];
+        }, $recent_transactions),
+    ];
 
-// Assemble the data payload
-$dashboard_data = [
-    'user' => [
-        'first_name' => $user['first_name'],
-        'kyc_status' => $mock_profile['kyc_status'],
-    ],
-    'wallet' => [
-        'total_usd' => number_format($total_wallet_usd, 2),
-    ],
-    'loan' => $mock_loan,
-    'savings' => $mock_savings,
-    'transactions' => $mock_transactions,
-];
+    send_json_response(200, [
+        'status' => 'success',
+        'data' => $dashboard_data,
+    ]);
 
-// Send the response
-send_json_response(200, [
-    'status' => 'success',
-    'data' => $dashboard_data,
-]);
+} catch (Exception $e) {
+    error_log("Dashboard data fetch failed for user_id {$user_id}: " . $e->getMessage());
+    send_json_response(500, ['status' => 'error', 'message' => 'Failed to fetch dashboard data.']);
+}
 ?>

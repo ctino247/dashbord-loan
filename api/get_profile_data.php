@@ -1,33 +1,34 @@
 <?php
-require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/helpers.php';
 require_once __DIR__ . '/auth.php';
 
-// Authenticate the user
 $user = handleTelegramAuth();
 $user_id = $user['id'];
 
-// --- MOCK DATA ---
-// In a real application, this would be a single query joining the `users`
-// and `user_profiles` tables to get all data related to the user.
+try {
+    $stmt = $pdo->prepare(
+        "SELECT u.telegram_id, u.first_name, u.last_name, u.username, u.email, u.profile_picture_url, p.id_number, p.id_image_url, p.kyc_status
+         FROM users u
+         LEFT JOIN user_profiles p ON u.id = p.user_id
+         WHERE u.id = ?"
+    );
+    $stmt->execute([$user_id]);
+    $profile_data = $stmt->fetch();
 
-// Combine base user data with more detailed profile data
-$mock_profile_data = [
-    'telegram_id' => $user['telegram_id'],
-    'first_name' => $user['first_name'],
-    'last_name' => $user['last_name'],
-    'username' => $user['username'],
-    'profile_picture_url' => 'assets/images/default-avatar.png', // Placeholder
-    'email' => 'dev.user@example.com', // Mocked email
-    'id_number' => 'AB1234567', // Mocked ID number
-    'id_image_url' => 'assets/images/sample_id.png', // Mocked ID image URL
-    'kyc_status' => 'approved', // Mocked status: 'pending', 'approved', 'rejected'
-];
+    if (!$profile_data) {
+        send_json_response(404, ['status' => 'error', 'message' => 'Profile not found.']);
+    }
 
-// --- END MOCK DATA ---
+    // Ensure a default profile picture if none is set
+    if (empty($profile_data['profile_picture_url'])) {
+        $profile_data['profile_picture_url'] = 'assets/images/default-avatar.png';
+    }
 
-send_json_response(200, [
-    'status' => 'success',
-    'data' => $mock_profile_data
-]);
+    send_json_response(200, ['status' => 'success', 'data' => $profile_data]);
+
+} catch (Exception $e) {
+    error_log("Profile data fetch failed for user_id {$user_id}: " . $e->getMessage());
+    send_json_response(500, ['status' => 'error', 'message' => 'Failed to fetch profile data.']);
+}
 ?>

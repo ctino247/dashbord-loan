@@ -1,5 +1,5 @@
 # Sensitive configuration
-config/config.php
+config.php
 
 # Composer dependencies
 vendor/

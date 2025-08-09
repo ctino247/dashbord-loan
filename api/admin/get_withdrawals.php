@@ -1,14 +1,31 @@
 <?php
-require_once '../../config/config.php';
+require_once '../../config.php';
 require_once '../helpers.php';
 
 // Admin auth check would go here
 
-$mock_withdrawals = [
-    ['id' => 'W001', 'user_name' => 'Mark Johnson', 'amount' => 0.01, 'currency' => 'BTC', 'address' => 'bc1q...', 'date' => '2024-07-29', 'status' => 'pending'],
-    ['id' => 'W002', 'user_name' => 'Sarah Lee', 'amount' => 500.00, 'currency' => 'USDT-TRC20', 'address' => 'T...', 'date' => '2024-07-28', 'status' => 'pending'],
-    ['id' => 'W003', 'user_name' => 'Dev User', 'amount' => 0.1, 'currency' => 'ETH', 'address' => '0x...', 'date' => '2024-07-26', 'status' => 'approved'],
-];
+try {
+    $stmt = $pdo->query(
+        "SELECT t.id, CONCAT(u.first_name, ' ', u.last_name) as user_name, t.amount, t.currency, t.tx_hash as address, t.created_at, t.status
+         FROM transactions t
+         JOIN users u ON t.user_id = u.id
+         WHERE t.type = 'withdrawal'
+         ORDER BY t.status = 'requires_approval' DESC, t.id DESC"
+    );
+    $withdrawals = $stmt->fetchAll();
 
-send_json_response(200, ['status' => 'success', 'data' => $mock_withdrawals]);
+    // Format date for display
+    $withdrawals = array_map(function($w) {
+        $w['id'] = 'W' . str_pad($w['id'], 4, '0', STR_PAD_LEFT);
+        $w['date'] = date('Y-m-d', strtotime($w['created_at']));
+        unset($w['created_at']);
+        return $w;
+    }, $withdrawals);
+
+    send_json_response(200, ['status' => 'success', 'data' => $withdrawals]);
+
+} catch (Exception $e) {
+    error_log("Admin get_withdrawals failed: " . $e->getMessage());
+    send_json_response(500, ['status' => 'error', 'message' => 'Failed to fetch withdrawal requests.']);
+}
 ?>
