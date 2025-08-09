@@ -58,9 +58,9 @@
                     <span class="font-semibold">Apply for a loan</span>
                     <div class="self-end mt-4 w-6 h-6 bg-gray-900 text-white rounded-full flex items-center justify-center">></div>
                 </div>
-                <div class="bg-white rounded-3xl p-6 shadow-md flex flex-col justify-between">
+                <div class="bg-white rounded-3xl p-6 shadow-md flex flex-col justify-between" onclick="showView('profile-view')">
                     <div class="w-10 h-10 bg-green-100 rounded-lg mb-4"></div>
-                    <span class="font-semibold">Make a loan payment</span>
+                    <span class="font-semibold">My Profile</span>
                     <div class="self-end mt-4 w-6 h-6 bg-gray-900 text-white rounded-full flex items-center justify-center">></div>
                 </div>
             </div>
@@ -97,6 +97,45 @@
                     </div>
                 </li>
              </ul>
+        </div>
+
+        <!-- Profile View -->
+        <div id="profile-view" class="view hidden p-4 space-y-4">
+            <h2 class="text-2xl font-bold">My Profile</h2>
+            <div class="bg-white rounded-3xl p-6 shadow-md text-center">
+                <div class="w-24 h-24 bg-green-200 rounded-full mx-auto mb-4">
+                    <!-- Profile image will be loaded here -->
+                </div>
+                <form id="profile-image-form">
+                    <label for="profile-image-upload" class="text-green-500 font-semibold cursor-pointer">Change Photo</label>
+                    <input type="file" id="profile-image-upload" name="profile_image" class="hidden">
+                </form>
+            </div>
+            <div class="bg-white rounded-3xl p-6 shadow-md space-y-2">
+                <p><strong>Email:</strong> <span id="profile-email"></span></p>
+                <p><strong>Telegram ID:</strong> <span id="profile-tg-id"></span></p>
+                <p><strong>KYC Status:</strong> <span id="kyc-status" class="font-semibold text-orange-500">Not Submitted</span></p>
+            </div>
+            <button class="w-full bg-green-500 text-white font-bold py-3 px-4 rounded-2xl" onclick="showView('kyc-view')">Complete KYC</button>
+            <button class="w-full bg-gray-200 text-gray-800 font-bold py-3 px-4 rounded-2xl" onclick="showView('dashboard-view')">Back to Dashboard</button>
+        </div>
+
+        <!-- KYC View -->
+        <div id="kyc-view" class="view hidden p-4 space-y-4">
+            <h2 class="text-2xl font-bold">KYC Verification</h2>
+            <p class="text-gray-500">Please provide your ID number and a clear photo of your ID document.</p>
+            <form id="kyc-form" class="space-y-4">
+                <div>
+                    <label for="id-number" class="block text-sm font-medium text-gray-700">ID Number</label>
+                    <input type="text" name="id_number" id="id-number" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500">
+                </div>
+                <div>
+                    <label for="id-image-upload" class="block text-sm font-medium text-gray-700">ID Image</label>
+                    <input type="file" id="id-image-upload" name="id_image" required class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100">
+                </div>
+                <button type="submit" class="w-full bg-green-500 text-white font-bold py-3 px-4 rounded-2xl">Submit for Verification</button>
+                <button type="button" class="w-full bg-gray-200 text-gray-800 font-bold py-3 px-4 rounded-2xl" onclick="showView('profile-view')">Back to Profile</button>
+            </form>
         </div>
     </main>
 

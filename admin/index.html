@@ -21,6 +21,8 @@
                 <a href="#" class="list-group-item list-group-item-action bg-dark text-white" onclick="showView('savings')">Savings Management</a>
                 <a href="#" class="list-group-item list-group-item-action bg-dark text-white" onclick="showView('transactions')">Transactions</a>
                 <a href="#" class="list-group-item list-group-item-action bg-dark text-white" onclick="showView('support')">Support Tickets</a>
+                <a href="#" class="list-group-item list-group-item-action bg-dark text-white" onclick="showView('kyc')">KYC Management</a>
+                <a href="#" class="list-group-item list-group-item-action bg-dark text-white" onclick="showView('mailer')">Mailer</a>
                 <a href="#" class="list-group-item list-group-item-action bg-dark text-white" onclick="showView('settings')">Settings</a>
                 <a href="#" class="list-group-item list-group-item-action bg-dark text-white" id="logout-btn">Logout</a>
             </div>
@@ -49,7 +51,44 @@
                     <!-- User table will go here -->
                 </div>
 
-                <!-- Other views will follow the same pattern -->
+                <!-- KYC Management View -->
+                <div id="kyc-view" class="view" style="display: none;">
+                    <h3>KYC Management</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>User ID</th>
+                                <th>Username</th>
+                                <th>ID Number</th>
+                                <th>Submitted At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="kyc-table-body">
+                            <!-- KYC submissions will be loaded here by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mailer View -->
+                <div id="mailer-view" class="view" style="display: none;">
+                    <h3>Send Email to User(s)</h3>
+                    <form id="mailer-form">
+                        <div class="mb-3">
+                            <label for="target-user" class="form-label">Target User ID (or 'all')</label>
+                            <input type="text" class="form-control" id="target-user" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Subject</label>
+                            <input type="text" class="form-control" id="subject" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea class="form-control" id="message" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send Email</button>
+                    </form>
+                </div>
 
             </main>
         </div>

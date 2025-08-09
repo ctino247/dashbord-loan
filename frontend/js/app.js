@@ -69,6 +69,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const viewTitles = {
             'dashboard-view': `Hi, ${currentUser ? currentUser.first_name : 'User'}!`,
             'loans-view': 'Loan Activity',
+            'profile-view': 'My Profile',
+            'kyc-view': 'KYC Verification'
         };
         document.getElementById('app-title').textContent = viewTitles[viewId] || 'Loan Platform';
 
@@ -76,52 +78,93 @@ document.addEventListener('DOMContentLoaded', function () {
         switch(viewId) {
             case 'dashboard-view': loadDashboardData(); break;
             case 'loans-view': loadLoansData(); break;
-            case 'wallet-view': loadWalletData(); break;
-            case 'savings-view': loadSavingsData(); break;
-            case 'support-view': loadSupportData(); break;
+            case 'profile-view': loadProfileData(); break;
+            // Other data loading calls can be added here
         }
     }
 
     // --- DATA LOADING FUNCTIONS ---
     function loadDashboardData() {
         if (!currentUser) return;
-        // Fetch wallet balance, loan summary, savings balance
-        // Placeholder data for now
-        document.getElementById('wallet-balance').textContent = '$...';
-        document.getElementById('active-loan-summary').textContent = '...';
-        document.getElementById('savings-balance').textContent = '$...';
-
-        // TODO: Implement actual API calls
-        // getWalletBalance();
-        // getActiveLoan();
-        // getSavingsBalance();
+        fetch(`${API_BASE_URL}/dashboard.php?user_id=${currentUser.id}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('wallet-balance').textContent = `$${parseFloat(data.wallet_balance).toFixed(2)}`;
+                document.getElementById('loans-amount-summary').textContent = `$${parseFloat(data.total_loan_amount).toFixed(2)}`;
+                // Assuming yearly payment is same as loan amount for this mock
+                document.getElementById('yearly-payment-summary').textContent = `$${parseFloat(data.total_loan_amount).toFixed(2)}`;
+                document.querySelector('#dashboard-view .text-gray-500').textContent = `Currently you have ${data.active_loan_count} loans.`;
+                updateKycStatus(data.kyc_status);
+            })
+            .catch(err => showError('Failed to load dashboard data.'));
     }
 
     function loadLoansData() {
-        console.log("Loading loans data...");
-        // TODO: Implement API call to GET /loans.php?user_id=...
+        if (!currentUser) return;
+        fetch(`${API_BASE_URL}/loans.php?user_id=${currentUser.id}`)
+            .then(response => response.json())
+            .then(data => {
+                const loanList = document.getElementById('loan-list');
+                loanList.innerHTML = ''; // Clear old data
+                if (data.message) {
+                    loanList.innerHTML = `<li class="text-gray-500 text-center">${data.message}</li>`;
+                } else {
+                    data.forEach(loan => {
+                        const statusClass = loan.status === 'repaid' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600';
+                        const item = `
+                            <li class="bg-white rounded-3xl p-4 flex items-center shadow-md">
+                                <div class="w-12 h-12 bg-green-100 rounded-xl mr-4"></div>
+                                <div class="flex-grow">
+                                    <p class="font-bold">${loan.product_name}</p>
+                                    <p class="text-sm text-gray-500">Applied: ${new Date(loan.created_at).toLocaleDateString()}</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold">$${parseFloat(loan.amount_requested).toFixed(2)}</p>
+                                    <span class="text-xs font-semibold ${statusClass} px-2 py-1 rounded-full">${loan.status}</span>
+                                </div>
+                            </li>`;
+                        loanList.innerHTML += item;
+                    });
+                }
+            })
+            .catch(err => showError('Failed to load loan data.'));
     }
 
-    function loadWalletData() {
-        console.log("Loading wallet data...");
-        // TODO: Implement API call to GET /transactions.php?user_id=...
+    function loadProfileData() {
+        if (!currentUser) return;
+        document.getElementById('profile-email').textContent = currentUser.email || 'Not set';
+        document.getElementById('profile-tg-id').textContent = currentUser.telegram_id;
+        // KYC status is loaded from dashboard data
     }
 
-    function loadSavingsData() {
-        console.log("Loading savings data...");
-        // TODO: Implement API call to GET /savings.php?user_id=...
+    function updateKycStatus(status) {
+        const kycStatusEl = document.getElementById('kyc-status');
+        const kycButton = document.querySelector('button[onclick="showView(\'kyc-view\')"]');
+        if (!kycStatusEl || !kycButton) return;
+
+        kycStatusEl.textContent = status;
+        switch(status.toLowerCase()) {
+            case 'approved':
+                kycStatusEl.className = 'font-semibold text-green-600';
+                kycButton.classList.add('hidden');
+                break;
+            case 'pending':
+                kycStatusEl.className = 'font-semibold text-yellow-500';
+                kycButton.textContent = 'KYC Submitted for Review';
+                kycButton.disabled = true;
+                break;
+            default: // Not Submitted or Rejected
+                kycStatusEl.className = 'font-semibold text-red-600';
+                kycButton.textContent = 'Complete KYC';
+                kycButton.disabled = false;
+        }
     }
 
-    function loadSupportData() {
-        console.log("Loading support tickets...");
-        // TODO: Implement API call to GET /tickets.php?user_id=...
-    }
+    // --- EVENT LISTENERS & FORM HANDLERS ---
 
-    // --- EVENT LISTENERS ---
-    // Navigation buttons
-    document.getElementById('apply-loan-btn').addEventListener('click', () => showView('loan-application-view'));
-    document.getElementById('withdraw-funds-btn').addEventListener('click', () => showView('withdrawal-view'));
-    document.getElementById('create-ticket-btn').addEventListener('click', () => showView('create-ticket-view')); // Need to create this view
+    // Loan Application Form
+    // (This view is not in the new design, but the logic might be needed later)
+    // function handleLoanApplication(event) { ... }
 
     // --- UTILITY FUNCTIONS ---
     function showError(message) {
@@ -129,6 +172,62 @@ document.addEventListener('DOMContentLoaded', function () {
         // In a real app, you'd show this in a modal or toast
         tg.showAlert(message);
     }
+
+    // --- KYC & PROFILE LOGIC ---
+    function handleProfileImageUpload(event) {
+        const file = event.target.files[0];
+        if (!file || !currentUser) return;
+
+        const formData = new FormData();
+        formData.append('action', 'upload_profile_image');
+        formData.append('user_id', currentUser.id);
+        formData.append('profile_image', file);
+
+        fetch(`${API_BASE_URL}/profile.php`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                tg.showAlert('Profile image updated successfully!');
+                // Optionally, update the image on the page
+            } else {
+                showError(data.message || 'Failed to upload image.');
+            }
+        })
+        .catch(err => showError('Error uploading image: ' + err));
+    }
+
+    function handleKycSubmit(event) {
+        event.preventDefault();
+        if (!currentUser) return;
+
+        const formData = new FormData(event.target);
+        formData.append('action', 'submit_kyc');
+        formData.append('user_id', currentUser.id);
+
+        fetch(`${API_BASE_URL}/profile.php`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message.includes('successfully')) {
+                tg.showAlert('KYC documents submitted for review.');
+                showView('profile-view');
+            } else {
+                showError(data.message || 'Failed to submit KYC documents.');
+            }
+        })
+        .catch(err => showError('Error submitting KYC: ' + err));
+    }
+
+
+    // Add event listeners for new forms
+    document.getElementById('profile-image-upload').addEventListener('change', handleProfileImageUpload);
+    document.getElementById('kyc-form').addEventListener('submit', handleKycSubmit);
+
 
     // --- INITIALIZATION ---
     authenticateUser();

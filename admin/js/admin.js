@@ -41,8 +41,79 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Load data for the view
-        // loadDataForView(viewId);
+        loadDataForView(viewId);
     }
+
+    function loadDataForView(viewId) {
+        if (viewId === 'kyc') {
+            loadKycData();
+        }
+    }
+
+    function loadKycData() {
+        fetch('/admin/api/kyc.php?status=pending')
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementById('kyc-table-body');
+                tableBody.innerHTML = '';
+                if (data.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="5" class="text-center">No pending KYC submissions.</td></tr>';
+                    return;
+                }
+                data.forEach(item => {
+                    const row = `
+                        <tr>
+                            <td>${item.user_id}</td>
+                            <td>${item.username}</td>
+                            <td>${item.id_number}</td>
+                            <td>${new Date(item.created_at).toLocaleString()}</td>
+                            <td>
+                                <a href="/${item.id_image_path}" target="_blank" class="btn btn-sm btn-info">View ID</a>
+                                <button class="btn btn-sm btn-success" onclick="updateKycStatus(${item.id}, 'approved')">Approve</button>
+                                <button class="btn btn-sm btn-danger" onclick="updateKycStatus(${item.id}, 'rejected')">Reject</button>
+                            </td>
+                        </tr>`;
+                    tableBody.innerHTML += row;
+                });
+            });
+    }
+
+    window.updateKycStatus = function(kycId, status) {
+        fetch('/admin/api/kyc.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ kyc_id: kycId, status: status })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            loadKycData(); // Refresh the list
+        });
+    }
+
+    function handleMailerSubmit(event) {
+        event.preventDefault();
+        const target = document.getElementById('target-user').value;
+        const subject = document.getElementById('subject').value;
+        const message = document.getElementById('message').value;
+
+        fetch('/admin/api/mailer.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ target_user_id: target, subject, message })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            if (data.message.includes('Successfully')) {
+                event.target.reset();
+            }
+        });
+    }
+
+    // --- EVENT LISTENERS ---
+    document.getElementById('mailer-form').addEventListener('submit', handleMailerSubmit);
+
 
     // --- LOGOUT ---
     if (logoutBtn) {

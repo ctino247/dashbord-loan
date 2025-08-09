@@ -129,5 +129,23 @@ class User {
         }
         return false;
     }
+
+    // Update user's profile image path
+    public function updateProfileImagePath($user_id, $path) {
+        $query = 'UPDATE ' . $this->table . ' SET profile_image_path = :path WHERE id = :id';
+        $stmt = $this->conn->prepare($query);
+
+        $this->id = htmlspecialchars(strip_tags($user_id));
+        $this->profile_image_path = htmlspecialchars(strip_tags($path));
+
+        $stmt->bindParam(':id', $this->id);
+        $stmt->bindParam(':path', $this->profile_image_path);
+
+        if($stmt->execute()) {
+            return true;
+        }
+        printf("Error: %s.\n", $stmt->error);
+        return false;
+    }
 }
 ?>
