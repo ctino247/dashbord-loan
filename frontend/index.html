@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Platform</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Manually define the colors from the design to be used in tailwind.config.js if needed */
+        /* Or just use them directly in the markup for simplicity in this environment */
+        body {
+            background-color: #f2f2f7;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <header class="bg-gray-100 p-4 sticky top-0 z-10 border-b">
+        <h1 id="app-title" class="text-xl font-bold text-gray-900">Hi, <span id="user-firstname">User</span>!</h1>
+    </header>
+
+    <main class="p-4">
+        <!-- Dashboard View -->
+        <div id="dashboard-view" class="view active">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <p class="text-gray-500">Currently you have 2 loans.</p>
+                </div>
+                <!-- Profile Pic Placeholder -->
+                <div class="w-12 h-12 bg-green-200 rounded-full"></div>
+            </div>
+
+            <div class="bg-white rounded-3xl p-6 text-center shadow-md mb-8">
+                <p class="text-gray-500">Current Balance</p>
+                <p class="text-4xl font-bold text-gray-900 my-2" id="wallet-balance">$1,459.20</p>
+                <div class="flex justify-around mt-4">
+                    <div class="text-center">
+                        <span class="text-sm text-gray-500">Loans Amount</span>
+                        <span class="block text-base font-semibold text-gray-900" id="loans-amount-summary">$159.20</span>
+                    </div>
+                    <div class="text-center">
+                        <span class="text-sm text-gray-500">Yearly Payment</span>
+                        <span class="block text-base font-semibold text-gray-900" id="yearly-payment-summary">$159.20</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Quick Link</h3>
+                <a href="#" class="text-green-500 font-semibold" onclick="showView('loans-view')">View All</a>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="bg-white rounded-3xl p-6 shadow-md flex flex-col justify-between" onclick="showView('loans-view')">
+                    <div class="w-10 h-10 bg-green-100 rounded-lg mb-4"></div>
+                    <span class="font-semibold">Apply for a loan</span>
+                    <div class="self-end mt-4 w-6 h-6 bg-gray-900 text-white rounded-full flex items-center justify-center">></div>
+                </div>
+                <div class="bg-white rounded-3xl p-6 shadow-md flex flex-col justify-between">
+                    <div class="w-10 h-10 bg-green-100 rounded-lg mb-4"></div>
+                    <span class="font-semibold">Make a loan payment</span>
+                    <div class="self-end mt-4 w-6 h-6 bg-gray-900 text-white rounded-full flex items-center justify-center">></div>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Loan Offer</h3>
+                <a href="#" class="text-green-500 font-semibold">View All</a>
+            </div>
+        </div>
+
+        <!-- Loans View -->
+        <div id="loans-view" class="view hidden">
+             <ul id="loan-list" class="space-y-4">
+                <li class="bg-white rounded-3xl p-4 flex items-center shadow-md">
+                    <div class="w-12 h-12 bg-green-100 rounded-xl mr-4"></div>
+                    <div class="flex-grow">
+                        <p class="font-bold">Business Loan</p>
+                        <p class="text-sm text-gray-500">Approved 02/02/2023</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold">$20,30.23</p>
+                        <span class="text-xs font-semibold bg-green-100 text-green-600 px-2 py-1 rounded-full">Paid</span>
+                    </div>
+                </li>
+                 <li class="bg-white rounded-3xl p-4 flex items-center shadow-md">
+                    <div class="w-12 h-12 bg-green-100 rounded-xl mr-4"></div>
+                    <div class="flex-grow">
+                        <p class="font-bold">Student Loan</p>
+                        <p class="text-sm text-gray-500">Approved 02/02/2023</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold">$32,59.04</p>
+                        <span class="text-xs font-semibold bg-red-100 text-red-600 px-2 py-1 rounded-full">Unpaid</span>
+                    </div>
+                </li>
+             </ul>
+        </div>
+    </main>
+
+    <!-- Telegram WebApp Script -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Custom JS -->
+    <script src="js/app.js"></script>
+</body>
+</html>
