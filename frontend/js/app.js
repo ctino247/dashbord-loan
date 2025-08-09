@@ -3,21 +3,17 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentUser = null;
 
     // Initialize Telegram Web App
-    const tg = window.Telegram.WebApp;
-    tg.ready();
+    const tg = window.Telegram ? window.Telegram.WebApp : null;
+    if (tg) {
+        tg.ready();
+    }
 
     // --- USER AUTHENTICATION ---
     function authenticateUser() {
-        // For testing outside Telegram, use mock data
-        if (!tg.initDataUnsafe || !tg.initDataUnsafe.user) {
-            console.log("Running in browser, using mock user data.");
-            const mockUser = {
-                id: 123456789,
-                first_name: 'Test',
-                last_name: 'User',
-                username: 'testuser'
-            };
-            handleAuthResponse(mockUser);
+        if (!tg || !tg.initDataUnsafe || !tg.initDataUnsafe.user) {
+            // Don't show a loading state indefinitely
+            document.getElementById('wallet-balance').textContent = 'N/A';
+            showError("Telegram user data not found. Please open this app through Telegram.");
             return;
         }
 
@@ -170,7 +166,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function showError(message) {
         console.error(message);
         // In a real app, you'd show this in a modal or toast
-        tg.showAlert(message);
+        if (tg) {
+            tg.showAlert(message);
+        }
     }
 
     // --- KYC & PROFILE LOGIC ---
