@@ -2,7 +2,7 @@
     <h2>Withdrawal Requests</h2>
     <p>Review and approve or reject user withdrawal requests.</p>
 
-    <table>
+    <table id="withdrawals-table">
         <thead>
             <tr>
                 <th>Request ID</th>

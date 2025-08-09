@@ -4,26 +4,26 @@
 
     <form id="settings-form">
         <div class="form-group">
-            <label for="loan-interest-rate">Default Loan Interest Rate (%)</label>
-            <input type="number" step="0.01" id="loan-interest-rate" name="loan_interest_rate" value="10.00">
+            <label for="loan_interest_rate">Default Loan Interest Rate (%)</label>
+            <input type="number" step="0.01" id="loan_interest_rate" name="loan_interest_rate" value="">
         </div>
         <div class="form-group">
-            <label for="savings-interest-rate">Savings Interest Rate (APY %)</label>
-            <input type="number" step="0.01" id="savings-interest-rate" name="savings_interest_rate" value="5.00">
+            <label for="savings_interest_rate">Savings Interest Rate (APY %)</label>
+            <input type="number" step="0.01" id="savings_interest_rate" name="savings_interest_rate" value="">
         </div>
         <hr>
         <h3>Crypto Addresses</h3>
         <div class="form-group">
-            <label for="btc-address">BTC Deposit Address</label>
-            <input type="text" id="btc-address" name="btc_address" value="YOUR_BTC_ADDRESS_HERE">
+            <label for="btc_address">BTC Deposit Address</label>
+            <input type="text" id="btc_address" name="btc_address" value="">
         </div>
         <div class="form-group">
-            <label for="usdt-address">USDT-TRC20 Deposit Address</label>
-            <input type="text" id="usdt-address" name="usdt_trc20_address" value="YOUR_USDT_TRC20_ADDRESS_HERE">
+            <label for="usdt_trc20_address">USDT-TRC20 Deposit Address</label>
+            <input type="text" id="usdt_trc20_address" name="usdt_trc20_address" value="">
         </div>
         <div class="form-group">
-            <label for="eth-address">ETH Deposit Address</label>
-            <input type="text" id="eth-address" name="eth_address" value="YOUR_ETH_ADDRESS_HERE">
+            <label for="eth_address">ETH Deposit Address</label>
+            <input type="text" id="eth_address" name="eth_address" value="">
         </div>
 
         <button type="submit" class="button">Save Settings</button>

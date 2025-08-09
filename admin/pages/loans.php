@@ -2,7 +2,7 @@
     <h2>Loan Application Approvals</h2>
     <p>Review and approve or reject new loan applications.</p>
 
-    <table>
+    <table id="loans-table">
         <thead>
             <tr>
                 <th>Application ID</th>

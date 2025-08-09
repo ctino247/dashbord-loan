@@ -4,7 +4,7 @@
 
     <!-- Add user search/filter controls here -->
 
-    <table>
+    <table id="users-table">
         <thead>
             <tr>
                 <th>User ID</th>
