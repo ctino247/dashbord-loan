@@ -18,10 +18,13 @@
             <?php endforeach; ?>
         </nav>
     </div>
-    <script src="assets/js/app.js?v=1.0"></script>
+    <script src="assets/js/app.js?v=1.1"></script>
     <script>
-        // Initialize the Telegram Web App
-        window.Telegram.WebApp.ready();
+        // Other inline scripts can go here if needed, but logic is in app.js
+        // For example, initializing the Telegram Web App
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.ready();
+        }
 
         // Expand the app to full height
         window.Telegram.WebApp.expand();
