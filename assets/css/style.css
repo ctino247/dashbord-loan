@@ -1,0 +1,243 @@
+/* Basic Reset & Theming */
+:root {
+    --bg-color: var(--tg-theme-bg-color, #18222d);
+    --text-color: var(--tg-theme-text-color, #ffffff);
+    --hint-color: var(--tg-theme-hint-color, #b1c3d5);
+    --link-color: var(--tg-theme-link-color, #62bcf9);
+    --button-color: var(--tg-theme-button-color, #3e9de6);
+    --button-text-color: var(--tg-theme-button-text-color, #ffffff);
+    --secondary-bg-color: var(--tg-theme-secondary-bg-color, #222e3a);
+    --header-bg-color: #1f2a37;
+    --accent-color: #52a5e4;
+    --destructive-color: #e53935;
+    --success-color: #4caf50;
+    --warning-color: #ff9800;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    overscroll-behavior-y: none;
+    -webkit-font-smoothing: antialiased;
+}
+
+.app-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding-bottom: 80px; /* Space for bottom nav */
+}
+
+/* Header */
+.app-header {
+    background-color: var(--header-bg-color);
+    padding: 15px;
+    text-align: center;
+}
+
+.app-header h1 {
+    font-size: 1.2rem;
+    margin: 0;
+    color: var(--text-color);
+}
+
+/* Main Content */
+.app-content {
+    padding: 15px;
+}
+
+/* Bottom Navigation */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-width: 500px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-around;
+    background-color: var(--header-bg-color);
+    border-top: 1px solid var(--secondary-bg-color);
+    padding: 5px 0;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: var(--hint-color);
+    padding: 5px 10px;
+    border-radius: 8px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.nav-item.active {
+    color: var(--link-color);
+}
+
+.nav-icon {
+    font-size: 1.5rem;
+}
+
+.nav-label {
+    font-size: 0.7rem;
+    margin-top: 2px;
+}
+
+/* Cards */
+.card {
+    background-color: var(--secondary-bg-color);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.card h3 {
+    margin-top: 0;
+    font-size: 1rem;
+    border-bottom: 1px solid var(--bg-color);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+/* Forms */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    color: var(--hint-color);
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="file"],
+select,
+textarea {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--bg-color);
+    border: 1px solid var(--header-bg-color);
+    border-radius: 8px;
+    color: var(--text-color);
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+/* Buttons */
+.button {
+    display: inline-block;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--button-color);
+    color: var(--button-text-color);
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+.button:active {
+    opacity: 0.8;
+}
+
+.button-secondary {
+    background-color: var(--secondary-bg-color);
+    border: 1px solid var(--button-color);
+    color: var(--button-color);
+}
+
+.button-destructive {
+    background-color: var(--destructive-color);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+/* Dashboard Specific */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.balance-large {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 5px 0;
+}
+
+.card small {
+    color: var(--hint-color);
+}
+
+.status-pending { color: var(--warning-color); }
+.status-approved, .status-active { color: var(--success-color); }
+.status-rejected { color: var(--destructive-color); }
+
+/* Profile Specific */
+.profile-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid var(--accent-color);
+    margin-bottom: 10px;
+}
+
+/* Wallet & Loan Pages */
+.asset-list, .recent-transactions ul {
+    list-style: none;
+    padding: 0;
+}
+.asset-list li, .recent-transactions li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--bg-color);
+}
+.asset-list li:last-child, .recent-transactions li:last-child {
+    border-bottom: none;
+}
+
+.asset-info { display: flex; align-items: center; gap: 15px; }
+.asset-icon { width: 40px; height: 40px; }
+.asset-balance { text-align: right; }
+
+.tx-type { font-weight: bold; }
+.tx-type.deposit, .tx-type.interest { color: var(--success-color); }
+.tx-type.withdrawal { color: var(--destructive-color); }
+
+.qr-code {
+    text-align: center;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    margin: 15px 0;
+}
+.wallet-address {
+    background-color: var(--bg-color);
+    padding: 10px;
+    border-radius: 8px;
+    word-wrap: break-word;
+    text-align: center;
+    color: var(--hint-color);
+}
