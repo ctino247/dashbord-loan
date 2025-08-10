@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../config.php';
+require_once '../app_config.php';
 
 $action = $_POST['action'] ?? $_GET['action'] ?? '';
 

@@ -1,5 +1,5 @@
 <?php
-require_once 'config.php';
+require_once 'app_config.php';
 require_once 'api/auth.php';
 
 // Authenticate user

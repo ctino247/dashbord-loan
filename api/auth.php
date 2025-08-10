@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../app_config.php';
 
 /**
  * Validates the data received from the Telegram Web App.
